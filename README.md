@@ -6,16 +6,48 @@ is capable of switching layout groups automatically in
 [i3wm](https://i3wm.org). It subscribes to i3wm events and, when a window is
 focused, switches to the last active layout for the window.
 
+Installation
+------------
+
+On Arch Linux
+[xkb-switch-i3](https://aur.archlinux.org/packages/xkb-switch-i3-git/) package
+is available in [AUR](https://aur.archlinux.org/).
+
+Dependencies for building from source:
+
+- i3-wm
+- jsoncpp
+- libsigc++
+- libx11
+- libxkbfile
+
+```sh
+# Clone this repo
+git clone https://github.com/zebradil/xkb-switch-i3
+# Init submodules
+git submodule update --init
+# Prepare
+cmake .
+# Build
+make
+# Install
+make install
+```
+
+
+Usage
+-----
+
 Run it in terminal and try changing windows and layouts to see how it works.
 
-```
-    $ xkb-switch --i3
+```sh
+xkb-switch --i3
 ```
 
 To have it started with i3, add the following to the configuration:
 
 ```
-    exec_always --no-startup-id xkb-switch --i3
+exec_always --no-startup-id xkb-switch --i3
 ```
 
 Original README
