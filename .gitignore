@@ -1,3 +1,5 @@
 build
 .*
 result
+Debug/*
+compile_commands.json
