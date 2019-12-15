@@ -1,6 +1,26 @@
+Xkb-switch-i3
+=============
 
-XKB-SWITCH
-===========
+This i3-flavored version of [xkb-switch](https://github.com/ierton/xkb-switch)
+is capable of switching layout groups automatically in
+[i3wm](https://i3wm.org). It subscribes to i3wm events and, when a window is
+focused, switches to the last active layout for the window.
+
+Run it in terminal and try changing windows and layouts to see how it works.
+
+```
+    $ xkb-switch --i3
+```
+
+To have it started with i3, add the following to the configuration:
+
+```
+    exec_always --no-startup-id xkb-switch --i3
+```
+
+Original README
+===============
+
 by J. Bromley, S. Mironov, Alexei Rad'kov
 
 xkb-switch is a C++ program that allows to query and change the XKB layout state.
