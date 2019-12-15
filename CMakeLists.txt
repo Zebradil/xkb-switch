@@ -17,6 +17,11 @@ endif()
 INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
 LINK_DIRECTORIES(${X11_LIBRARY_DIR})
 
+ADD_SUBDIRECTORY(i3ipc++)
+
+INCLUDE_DIRECTORIES(${I3IPCpp_INCLUDE_DIRS})
+LINK_DIRECTORIES(${I3IPCpp_LIBRARY_DIRS})
+
 # Compile and link program
 OPTION(BUILD_XKBSWITCH_LIB
     "Build a library compatible with vim's libcall interface" ON)
@@ -26,7 +31,7 @@ if(BUILD_XKBSWITCH_LIB)
     SET_TARGET_PROPERTIES(${xkblib} PROPERTIES VERSION ${XKBSWITCH_VERSION} SOVERSION ${MAJOR_VERSION})
     TARGET_LINK_LIBRARIES(${xkblib} X11 xkbfile)
     ADD_EXECUTABLE(xkb-switch src/XKbSwitch.cpp)
-    TARGET_LINK_LIBRARIES(xkb-switch ${xkblib})
+    TARGET_LINK_LIBRARIES(xkb-switch ${xkblib} ${I3IPCpp_LIBRARIES})
 else()
     ADD_EXECUTABLE(xkb-switch src/XKbSwitch.cpp src/XKeyboard.cpp)
     TARGET_LINK_LIBRARIES(xkb-switch X11 xkbfile)

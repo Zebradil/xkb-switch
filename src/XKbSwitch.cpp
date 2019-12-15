@@ -22,6 +22,9 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <map>
+
+#include <i3ipc++/ipc.hpp>
 
 #include "XKeyboard.h"
 #include "XKbSwitch.hpp"
@@ -31,14 +34,15 @@ using namespace kb;
 
 void usage()
 {
-  cerr << "Usage: xkb-switch -s ARG            Sets current layout group to ARG" << endl;
-  cerr << "       xkb-switch -l|--list         Displays all layout groups" << endl;
-  cerr << "       xkb-switch -h|--help         Displays this message" << endl;
-  cerr << "       xkb-switch -v|--version      Shows version number" << endl;
-  cerr << "       xkb-switch -w|--wait [-p]    Waits for group change" << endl;
-  cerr << "       xkb-switch -W                Infinitely waits for group change, prints group names to stdout" << endl;
-  cerr << "       xkb-switch -n|--next         Switch to the next layout group" << endl;
-  cerr << "       xkb-switch [-p]              Displays current layout group" << endl;
+  cerr << "Usage: xkb-switch -s ARG         Sets current layout group to ARG" << endl;
+  cerr << "       xkb-switch -l|--list      Displays all layout groups" << endl;
+  cerr << "       xkb-switch -h|--help      Displays this message" << endl;
+  cerr << "       xkb-switch -v|--version   Shows version number" << endl;
+  cerr << "       xkb-switch -w|--wait [-p] Waits for group change" << endl;
+  cerr << "       xkb-switch -W|--longwait  Infinitely waits for group change, prints group names to stdout" << endl;
+  cerr << "       xkb-switch -n|--next      Switch to the next layout group" << endl;
+  cerr << "       xkb-switch [-p]           Displays current layout group" << endl;
+  cerr << "       xkb-switch --i3           Monitor and automatically switch layouts in i3wm" << endl;
 }
 
 string print_layouts(const string_vector& sv)
@@ -56,11 +60,44 @@ string print_layouts(const string_vector& sv)
   return oss.str();
 }
 
+void i3_watch(XKeyboard xkb, const string_vector& syms) {
+  map<int, int> window_group_map;
+  int previous_container_id = 0;
+  int default_group = xkb.get_group();
+
+  i3ipc::connection conn;
+
+  conn.subscribe(i3ipc::ET_WINDOW);
+
+  conn.signal_window_event.connect(
+    [&previous_container_id, &default_group, &window_group_map, &xkb, &syms]
+    (const i3ipc::window_event_t&  ev) {
+      map<int, int>::iterator it;
+      int new_group;
+      if (ev.type == i3ipc::WindowEventType::FOCUS) {
+        std::cout << "\tSwitched to #" << ev.container->id << " - \"" << ev.container->name << '"' << std::endl;
+        if (previous_container_id != 0) {
+          window_group_map[previous_container_id] = xkb.get_group();
+        }
+        it = window_group_map.find(ev.container->id);
+        new_group = it != window_group_map.end() ? it->second : default_group;
+        xkb.set_group(new_group);
+        previous_container_id = ev.container->id;
+        std::cout << "\tWindow layout: " << syms.at(new_group) << std::endl;
+      }
+    }
+  );
+  
+  while (true) {
+    conn.handle_event();
+  }
+}
+
 int main( int argc, char* argv[] )
 {
-	string_vector syms;
+  string_vector syms;
 
-	using namespace std;
+  using namespace std;
   try {
     int m_cnt = 0;
     int m_wait = 0;
@@ -68,9 +105,10 @@ int main( int argc, char* argv[] )
     int m_print = 0;
     int m_next = 0;
     int m_list = 0;
+    int m_i3 = 0;
     string newgrp;
 
-    for(int i=1; i<argc; i) {
+    for(int i=1; i<argc;) {
       string arg(argv[i++]);
       if(arg == "-s") {
         CHECK_MSG(i<argc, "Argument expected");
@@ -101,6 +139,10 @@ int main( int argc, char* argv[] )
         m_next = 1;
         m_cnt++;
       }
+      else if(arg == "--i3") {
+        m_i3 = 1;
+        m_cnt++;
+      }
       else if(arg == "-h" || arg == "--help") {
         usage();
         return 1;
@@ -110,7 +152,7 @@ int main( int argc, char* argv[] )
       }
     }
 
-    if(m_list || m_lwait || !newgrp.empty())
+    if(m_list || m_lwait || m_i3 || !newgrp.empty())
       CHECK_MSG(m_cnt==1, "Invalid flag combination. Try --help.");
 
     // Default action
@@ -160,6 +202,11 @@ int main( int argc, char* argv[] )
         cout << syms[i] << endl;
       }
     }
+
+    if(m_i3) {
+      i3_watch(xkb, syms);
+    }
+
     return 0;
   }
   catch(std::exception & err) {
