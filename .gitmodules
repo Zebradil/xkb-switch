@@ -1,6 +1,3 @@
 [submodule "i3ipc++"]
 	path = i3ipc++
 	url = https://github.com/drmgc/i3ipcpp.git
-[submodule "AUR/xkb-switch-i3-git"]
-	path = AUR/xkb-switch-i3-git
-	url = ssh://aur@aur.archlinux.org/xkb-switch-i3-git.git
