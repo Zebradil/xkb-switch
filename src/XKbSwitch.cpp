@@ -70,19 +70,30 @@ void i3_watch(XKeyboard xkb, const string_vector& syms) {
   conn.subscribe(i3ipc::ET_WINDOW);
 
   conn.signal_window_event.connect(
-    [&previous_container_id, &default_group, &window_group_map, &xkb, &syms]
+    [
+      &default_group,
+      &previous_container_id,
+      &syms,
+      &window_group_map,
+      &xkb
+    ]
     (const i3ipc::window_event_t&  ev) {
-      map<int, int>::iterator it;
+
       int new_group;
+      map<int, int>::iterator it;
+
       if (ev.type == i3ipc::WindowEventType::FOCUS) {
         std::cout << "\tSwitched to #" << ev.container->id << " - \"" << ev.container->name << '"' << std::endl;
+
         if (previous_container_id != 0) {
           window_group_map[previous_container_id] = xkb.get_group();
         }
+
         it = window_group_map.find(ev.container->id);
         new_group = it != window_group_map.end() ? it->second : default_group;
         xkb.set_group(new_group);
         previous_container_id = ev.container->id;
+
         std::cout << "\tWindow layout: " << syms.at(new_group) << std::endl;
       }
     }
