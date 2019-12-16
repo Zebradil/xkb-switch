@@ -6,6 +6,8 @@ is capable of switching layout groups automatically in
 [i3wm](https://i3wm.org). It subscribes to i3wm events and, when a window is
 focused, switches to the last active layout for the window.
 
+NOTE: Starting from version `1.6.1` xkb-switch-i3 has it's own versioning.
+
 Installation
 ------------
 
