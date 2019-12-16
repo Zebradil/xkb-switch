@@ -11,9 +11,10 @@ NOTE: Starting from version `1.6.1` xkb-switch-i3 has it's own versioning.
 Installation
 ------------
 
-On Arch Linux
-[xkb-switch-i3](https://aur.archlinux.org/packages/xkb-switch-i3-git/) package
-is available in [AUR](https://aur.archlinux.org/).
+For Arch Linux
+[xkb-switch-i3](https://aur.archlinux.org/packages/xkb-switch-i3/) and
+[xkb-switch-i3-git](https://aur.archlinux.org/packages/xkb-switch-i3-git/) packages
+are available in [AUR](https://aur.archlinux.org/).
 
 Dependencies for building from source:
 
