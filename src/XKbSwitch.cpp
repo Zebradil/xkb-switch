@@ -41,6 +41,7 @@ void usage()
   cerr << "       xkb-switch -w|--wait [-p] Waits for group change" << endl;
   cerr << "       xkb-switch -W|--longwait  Infinitely waits for group change, prints group names to stdout" << endl;
   cerr << "       xkb-switch -n|--next      Switch to the next layout group" << endl;
+  cerr << "       xkb-switch -d|--debug     Print debug information" << endl;
   cerr << "       xkb-switch [-p]           Displays current layout group" << endl;
   cerr << "       xkb-switch --i3           Monitor and automatically switch layouts in i3wm" << endl;
 }
@@ -98,7 +99,7 @@ void i3_watch(XKeyboard xkb, const string_vector& syms) {
       }
     }
   );
-  
+
   while (true) {
     conn.handle_event();
   }
@@ -106,7 +107,9 @@ void i3_watch(XKeyboard xkb, const string_vector& syms) {
 
 int main( int argc, char* argv[] )
 {
+  int verbose = 1;
   string_vector syms;
+  bool syms_collected = false;
 
   using namespace std;
   try {
@@ -158,9 +161,16 @@ int main( int argc, char* argv[] )
         usage();
         return 1;
       }
+      else if(arg == "-d" || arg == "--debug") {
+        verbose++;
+      }
       else {
         THROW_MSG("Invalid argument: '" << arg << "'. Check --help.");
       }
+    }
+
+    if (verbose > 1) {
+      cerr << "[DEBUG] xkb-switch version " << XKBSWITCH_VERSION << endl;
     }
 
     if(m_list || m_lwait || m_i3 || !newgrp.empty())
@@ -181,20 +191,24 @@ int main( int argc, char* argv[] )
       while(true) {
         xkb.wait_event();
         xkb.build_layout(syms);
+        syms_collected = true;
         cout << syms.at(xkb.get_group()) << endl;
       }
     }
 
-    if (m_lwait)
-      syms.clear();
-
-    xkb.build_layout(syms);
+    layout_variant_strings lv = xkb.get_layout_variant();
+    if(verbose>1) {
+      cerr << "[DEBUG] layout: " << (lv.first.length() > 0 ? lv.first : "<empty>") << endl;
+      cerr << "[DEBUG] variant: " << (lv.second.length() > 0 ? lv.second : "<empty>") << endl;
+    }
+    xkb.build_layout_from(syms, lv);
+    syms_collected = true;
 
     if (m_next) {
       CHECK_MSG(!syms.empty(), "No layout groups configured");
       const string nextgrp = syms.at(xkb.get_group());
       string_vector::iterator i = find(syms.begin(), syms.end(), nextgrp);
-      if (++i == syms.end()) i = syms.begin();
+      if (++i == syms.end())i = syms.begin();
       xkb.set_group(i - syms.begin());
     }
     else if(!newgrp.empty()) {
@@ -222,8 +236,8 @@ int main( int argc, char* argv[] )
   }
   catch(std::exception & err) {
     cerr << "xkb-switch: " << err.what() << endl;
-    // TODO: don't print syms if they are not yet collected
-    cerr << "xkb-switch: layouts: " << print_layouts(syms) << endl;
+    if(syms_collected)
+      cerr << "xkb-switch: layouts: " << print_layouts(syms) << endl;
     return 2;
   }
 }

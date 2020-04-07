@@ -35,36 +35,37 @@ using std::string;
 namespace kb {
 
 typedef std::vector<std::string> string_vector;
-
+typedef std::pair<std::string,std::string> layout_variant_strings;
 
 class XKeyboard
 {
 public:
 
-	Display* _display;
-	int _deviceId;
-	XkbDescRec* _kbdDescPtr;
+  Display* _display;
+  int _deviceId;
+  XkbDescRec* _kbdDescPtr;
 
-	XKeyboard();
-	~XKeyboard();
+  XKeyboard();
+  ~XKeyboard();
 
   // Opens display (or throw std::runtime_error)
   void open_display(void);
 
-	// Gets the current layout
-	int get_group() const;
+  // Gets the current layout
+  int get_group() const;
 
-	// Sets the layout
-	void set_group(int num);
+  // Sets the layout
+  void set_group(int num);
 
-	// Returns keyboard layout string
-	void build_layout(string_vector& vec);
+  // Return layout/variant strings
+  layout_variant_strings get_layout_variant();
 
-	// Waits for kb event
-	void wait_event();
+  // Returns keyboard layout string
+  void build_layout_from(string_vector& vec, const layout_variant_strings& lv);
+  void build_layout(string_vector& vec);
 
-private:
-
+  // Waits for kb event
+  void wait_event();
 };
 
 }

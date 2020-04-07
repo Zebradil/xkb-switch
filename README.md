@@ -127,7 +127,7 @@ VIM integration
 Xkb-switch goes with a library libxkbswitch.so which can be called from
 within Vim scripts like this:
 
-```
+```vim
     let g:XkbSwitchLib = "/path/to/libxkbswitch.so"
     echo libcall(g:XkbSwitchLib, 'Xkb_Switch_getXkbLayout', '')
     call libcall(g:XkbSwitchLib, 'Xkb_Switch_setXkbLayout', 'us')
@@ -161,6 +161,15 @@ Bugs or Problems
 
 Admittedly, I only tested with a few different layouts that I used. If you find
 any bugs let me know by submitting an issue or via grrwlf@gmail.com.
+
+References:
+
+* <https://www.x.org/releases/X11R7.5/doc/input/XKB-Config.html>
+  - XKB configuration
+* <https://www.x.org/releases/current/doc/xorg-docs/input/XKB-Enhancing.html>
+  - How to further enhance XKB configuration
+* <https://0x64616c.livejournal.com/914.html>
+  - Old LJ post by Mitya describing minimalistic X11 kb test application
 
 Regards,
 Sergey.
