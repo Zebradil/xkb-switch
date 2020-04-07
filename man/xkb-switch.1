@@ -1,44 +1,49 @@
-.TH "xkb-switch" "1" "1.3.1" "J. Bromley, S. Mironov, Alexei Rad'kov" "User Commands"
+.TH "xkb-switch" "1" "1.7.1" "J. Bromley, S. Mironov, Alexei Rad'kov, German Lashevich" "User Commands"
 .SH "xkb-switch"
-.LP 
+.LP
 .B xkb\-switch
-is a C++ program that allows to query and change the XKB layout state.
+is a C++ program that allows to query and change the XKB layout state. This version is able to subscribe to i3wm events.
 .SH "SYNTAX"
-.LP 
-xkb\-switch [options] 
+.LP
+xkb\-switch [options]
 .SH "DESCRIPTION"
-.LP 
+.LP
 .B xkb\-switch
 is a C++ program that allows to query and change the XKB layout state. Originally ruby\-based code written by J. Bromley.
 .SH "OPTIONS"
-.LP 
-.TP 
+.LP
+.TP
 \fB\-s\fR <layout>
 Set current layout group to <layout>.
-.TP 
+.TP
 .BR \-l ", "\-\^\-list
 Display all layout groups.
-.TP 
+.TP
 .BR \-h ", "\-\^\-help
 Display a help message.
-.TP 
+.TP
 .BR \-v ", "\-\^\-version
 Show version number.
-.TP 
+.TP
 .BR \-w " "[\-p] ", "\-\^\-wait " "[\-p]
 Wait for group change and exits.
 If \fB\-p\fR is specified, print the new layout group.
-.TP 
-.BR \-W
+.TP
+.BR \-W ", "\-\^\-longwait
 Infinitely wait for group change.
-.TP 
+.TP
 .BR \-n ", " \-\^\-next
 Switch to the next layout group.
-.TP 
-.TP 
+.TP
+.BR \-d ", " \-\^\-debug
+Print debug information.
+.TP
 .BR \-p
 Display current layout group.
-.TP 
+.TP
+.BR \-\^\-i3
+Monitor and automatically switch layouts in i3wm
+.TP
 .SH "AUTHORS"
-.LP 
-J. Bromley, S. Mironov, Alexei Rad'kov
+.LP
+J. Bromley, S. Mironov, Alexei Rad'kov, German Lashevich
