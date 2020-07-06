@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <sstream>
 #include <map>
+#include <ctime>
 
 #include <i3ipc++/ipc.hpp>
 
@@ -84,7 +85,10 @@ void i3_watch(XKeyboard xkb, const string_vector& syms) {
       map<int, int>::iterator it;
 
       if (ev.type == i3ipc::WindowEventType::FOCUS) {
-        std::cout << "\tSwitched to #" << ev.container->id << " - \"" << ev.container->name << '"' << std::endl;
+        std::time_t t = std::time(nullptr);
+        char mbstr[100];
+        std::strftime(mbstr, sizeof(mbstr), "%Y-%m-%dT%X", std::localtime(&t));
+        std::cout << "[" << mbstr << "] Switched to #" << ev.container->id << " - \"" << ev.container->name << '"' << std::endl;
 
         if (previous_container_id != 0) {
           window_group_map[previous_container_id] = xkb.get_group();
