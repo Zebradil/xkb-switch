@@ -3,16 +3,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT( XKB-SWITCH )
 SET(MAJOR_VERSION 1)
 SET(MINOR_VERSION 8)
-SET(RELEASE_VERSION 1)
+SET(RELEASE_VERSION 5)
 SET(XKBSWITCH_VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${RELEASE_VERSION})
 ADD_DEFINITIONS(-DXKBSWITCH_VERSION="${XKBSWITCH_VERSION}")
 
 # Check presence of development libraries required for build
 FIND_PACKAGE(X11 REQUIRED)
 if(NOT X11_FOUND)
-    message(FATAL_ERROR "Not found development files of 'libx11' required for build. (Install libx11-dev or libx11-devel package.) CMake will exit.")
+    MESSAGE(FATAL_ERROR "Not found development files of 'libx11' required for build. (Install libx11-dev or libx11-devel package.) CMake will exit.")
 elseif(NOT X11_Xkbfile_FOUND)
-    message(FATAL_ERROR "Not found development files of 'libxkbfile' required for build. (Install libxkbfile-dev or libxkbfile-devel package.) CMake will exit.")
+    MESSAGE(FATAL_ERROR "Not found development files of 'libxkbfile' required for build. (Install libxkbfile-dev or libxkbfile-devel package.) CMake will exit.")
 endif()
 INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
 LINK_DIRECTORIES(${X11_LIBRARY_DIR})
@@ -43,7 +43,7 @@ INSTALL(TARGETS xkb-switch ${xkblib}
     LIBRARY DESTINATION lib OPTIONAL
 )
 
-SET(MAN_COMPRESSION "gz" CACHE STRING "Manpages compression tool")
+SET(MAN_COMPRESSION "gzip" CACHE STRING "Manpages compression tool")
 SET(MANDIR "${CMAKE_INSTALL_PREFIX}/share/man" CACHE STRING "Manpages installation path")
 
 # Function to compress and install man page
@@ -52,12 +52,7 @@ function(install_man man_filename man_type)
     # check what compression tool is available
     FIND_PROGRAM(COMPRESS_EXECUTABLE NAMES ${MAN_COMPRESSION})
     if(NOT COMPRESS_EXECUTABLE)
-        FIND_PROGRAM(COMPRESS_EXECUTABLE NAMES gzip)
-        if(COMPRESS_EXECUTABLE)
-            SET(MAN_COMPRESSION gz)
-        else()
-            SET(MAN_COMPRESSION NO)
-        endif()
+      SET(MAN_COMPRESSION NO)
     endif()
     # set input an output file names
     SET(raw_man man/${man_filename}.${man_type})
@@ -72,7 +67,7 @@ function(install_man man_filename man_type)
         )
     # elsewise just copy
     else()
-        MESSAGE(WARNING "There is no compression tool for man pages (xz or gzip). Not compressed copy of man file will be used.")
+        MESSAGE(WARNING "There is no compression tool for man pages (gzip). Not compressed copy of man file will be used.")
         SET(compressed_man ${CMAKE_BINARY_DIR}/${man_filename}.${man_type})
         ADD_CUSTOM_COMMAND(OUTPUT ${compressed_man}
             COMMAND cp ${raw_man} ${CMAKE_BINARY_DIR}

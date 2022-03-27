@@ -80,13 +80,21 @@ installed to build the program.
 To build the program manually, unpack the tarball and cd to source directory.
 [Nix](http://nixos.org/nix) users may use `nix-shell` to enter the minimally
 sufficient development shell or `nix-build` to build the sources. Other
-distributions typically require the following commands to build in install the
+distributions typically require the following commands to build and install the
 program:
 
 ```sh
 $ mkdir build && cd build
 $ cmake ..
 $ make
+```
+
+Optionally, test the basic functions by running `./test.sh` script. The script
+should print OK in the last line and return exit code of zero.
+
+```sh
+$ ../test.sh 2>&1 | tee test.log
+$ tail -n 1 test.log | grep OK || echo "Test failed!"
 ```
 
 In order to install, use your system's package manager or default to the following:

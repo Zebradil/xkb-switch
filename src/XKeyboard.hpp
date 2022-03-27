@@ -18,8 +18,8 @@
  * along with Xkb-switch. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef XKEYBOARD_H
-#define XKEYBOARD_H
+#ifndef XKEYBOARD_HPP
+#define XKEYBOARD_HPP
 
 #include <vector>
 #include <string>
@@ -29,8 +29,6 @@
 #include <X11/XKBlib.h>
 #include <map>
 #include <string>
-
-using std::string;
 
 namespace kb {
 
@@ -44,8 +42,9 @@ public:
   Display* _display;
   int _deviceId;
   XkbDescRec* _kbdDescPtr;
+  size_t _verbose;
 
-  XKeyboard();
+  XKeyboard(size_t verbose);
   ~XKeyboard();
 
   // Opens display (or throw std::runtime_error)

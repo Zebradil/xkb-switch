@@ -23,21 +23,35 @@
 
 #include <exception>
 #include <stdexcept>
+#include <iostream>
 
-#define THROW_MSG(msg) do{ \
+#define MSG(verbose, msg) do { \
+  if (verbose >= 2) { \
+    std::cerr << __FILE__ << ":" << __LINE__ << ": "; \
+    std::cerr << msg << std::endl; \
+  } \
+} while(0)
+
+#define THROW_MSG(verbose, msg) do { \
   std::ostringstream oss; \
-  oss << __FILE__ << ":" << __LINE__ << ":" << msg; \
+  if (verbose >= 2) { \
+    oss << __FILE__ << ":" << __LINE__ << ": "; \
+  } \
+  oss << msg; \
   throw std::runtime_error(oss.str()); \
 } while(0)
 
-#define CHECK_MSG(x,msg) do{ \
+#define CHECK_MSG(verbose, x, msg) do { \
   if(!(x)) { \
     std::ostringstream oss; \
-    oss << __FILE__ << ":" << __LINE__ << ": Condition " << #x << " failed. " << msg; \
+    if (verbose >= 2) { \
+      oss << __FILE__ << ":" << __LINE__ << ": Condition " << #x << " failed. "; \
+    } \
+    oss << msg; \
     throw std::runtime_error(oss.str()); \
   } \
 } while(0)
 
-#define CHECK(x) CHECK_MSG(x,"")
+#define CHECK(verbose, x) CHECK_MSG(verbose, x, "")
 
 #endif

@@ -22,13 +22,15 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <getopt.h>
+
 #include <map>
 #include <ctime>
 
 #include <i3ipc++/ipc.hpp>
 
-#include "XKeyboard.h"
-#include "XKbSwitch.hpp"
+#include "XKeyboard.hpp"
+#include "Utils.hpp"
 
 using namespace std;
 using namespace kb;
@@ -111,11 +113,10 @@ void i3_watch(XKeyboard xkb, const string_vector& syms) {
 
 int main( int argc, char* argv[] )
 {
-  int verbose = 1;
+  size_t verbose = 1;
   string_vector syms;
   bool syms_collected = false;
 
-  using namespace std;
   try {
     int m_cnt = 0;
     int m_wait = 0;
@@ -124,52 +125,71 @@ int main( int argc, char* argv[] )
     int m_next = 0;
     int m_list = 0;
     int m_i3 = 0;
+    int opt;
+    int option_index = 0;
     string newgrp;
 
-    for(int i=1; i<argc;) {
-      string arg(argv[i++]);
-      if(arg == "-s") {
-        CHECK_MSG(i<argc, "Argument expected");
-        newgrp=argv[i++];
-        m_cnt++;
-      }
-      else if(arg == "-l" || arg == "--list") {
-        m_list = 1;
-        m_cnt++;
-      }
-      else if(arg == "-v" || arg=="--version") {
-        cerr << "xkb-switch " << XKBSWITCH_VERSION << endl;
-        return 0;
-      }
-      else if(arg == "-w" || arg == "--wait") {
-        m_wait = 1;
-        m_cnt++;
-      }
-      else if(arg == "-W" || arg == "--longwait") {
-        m_lwait = 1;
-        m_cnt++;
-      }
-      else if(arg == "-p" || arg == "--print") {
-        m_print = 1;
-        m_cnt++;
-      }
-      else if(arg == "-n" || arg == "--next") {
-        m_next = 1;
-        m_cnt++;
-      }
-      else if(arg == "--i3") {
+    static struct option long_options[] = {
+            {"i3", no_argument, NULL, '3'},
+            {"set", required_argument, NULL, 's'},
+            {"list", no_argument, NULL, 'l'},
+            {"version", no_argument, NULL, 'v'},
+            {"wait", no_argument, NULL, 'w'},
+            {"longwait", no_argument, NULL, 'W'},
+            {"print", no_argument, NULL, 'p'},
+            {"next", no_argument, NULL, 'n'},
+            {"help", no_argument, NULL, 'h'},
+            {"debug", no_argument, NULL, 'd'},
+            {NULL, 0, NULL, 0},
+    };
+    while ((opt = getopt_long(argc, argv, "s:lvwWpnhd",
+                              long_options, &option_index))!=-1) {
+      switch (opt) {
+      case '3':
         m_i3 = 1;
         m_cnt++;
-      }
-      else if(arg == "-h" || arg == "--help") {
+        break;
+      case 's':
+        if (!optarg || string(optarg).empty())
+          CHECK_MSG(verbose, 0, "Argument expected");
+        newgrp=optarg;
+        m_cnt++;
+        break;
+      case 'l':
+        m_list = 1;
+        m_cnt++;
+        break;
+      case 'v':
+        cerr << "xkb-switch " << XKBSWITCH_VERSION << endl;
+        break;
+      case 'w':
+        m_wait = 1;
+        m_cnt++;
+        break;
+      case 'W':
+        m_lwait = 1;
+        m_cnt++;
+        break;
+      case 'p':
+        m_print = 1;
+        m_cnt++;
+        break;
+      case 'n':
+        m_next = 1;
+        m_cnt++;
+        break;
+      case 'h':
         usage();
-        return 1;
-      }
-      else if(arg == "-d" || arg == "--debug") {
+        break;
+      case 'd':
         verbose++;
-      }
-      else {
-        THROW_MSG("Invalid argument: '" << arg << "'. Check --help.");
+        break;
+      case '?':
+        THROW_MSG(verbose, "Invalid arguments. Check --help.");
+        break;
+      default:
+        THROW_MSG(verbose, "Invalid argument: '" << (char)opt << "'. Check --help.");
+        break;
       }
     }
 
@@ -177,14 +197,15 @@ int main( int argc, char* argv[] )
       cerr << "[DEBUG] xkb-switch version " << XKBSWITCH_VERSION << endl;
     }
 
-    if(m_list || m_lwait || m_i3 || !newgrp.empty())
-      CHECK_MSG(m_cnt==1, "Invalid flag combination. Try --help.");
+    if(m_list || m_lwait || m_i3 || !newgrp.empty()) {
+      CHECK_MSG(verbose, m_cnt==1, "Invalid flag combination. Try --help.");
+    }
 
     // Default action
     if(m_cnt==0)
       m_print = 1;
 
-    XKeyboard xkb;
+    XKeyboard xkb(verbose);
     xkb.open_display();
 
     if(m_wait) {
@@ -201,7 +222,7 @@ int main( int argc, char* argv[] )
     }
 
     layout_variant_strings lv = xkb.get_layout_variant();
-    if(verbose>1) {
+    if(verbose >= 2) {
       cerr << "[DEBUG] layout: " << (lv.first.length() > 0 ? lv.first : "<empty>") << endl;
       cerr << "[DEBUG] variant: " << (lv.second.length() > 0 ? lv.second : "<empty>") << endl;
     }
@@ -209,7 +230,7 @@ int main( int argc, char* argv[] )
     syms_collected = true;
 
     if (m_next) {
-      CHECK_MSG(!syms.empty(), "No layout groups configured");
+      CHECK_MSG(verbose, !syms.empty(), "No layout groups configured");
       const string nextgrp = syms.at(xkb.get_group());
       string_vector::iterator i = find(syms.begin(), syms.end(), nextgrp);
       if (++i == syms.end())i = syms.begin();
@@ -217,7 +238,7 @@ int main( int argc, char* argv[] )
     }
     else if(!newgrp.empty()) {
       string_vector::iterator i = find(syms.begin(), syms.end(), newgrp);
-      CHECK_MSG(i!=syms.end(),
+      CHECK_MSG(verbose, i!=syms.end(),
         "Group '" << newgrp << "' is not supported by current layout. Try xkb-switch -l.");
       xkb.set_group(i-syms.begin());
     }
@@ -239,9 +260,15 @@ int main( int argc, char* argv[] )
     return 0;
   }
   catch(std::exception & err) {
-    cerr << "xkb-switch: " << err.what() << endl;
-    if(syms_collected)
-      cerr << "xkb-switch: layouts: " << print_layouts(syms) << endl;
+    if ( verbose >= 2) {
+      cerr << "xkb-switch: ";
+    }
+    cerr << err.what() << endl;
+    if (verbose >= 2) {
+      if (syms_collected) {
+        cerr << "xkb-switch: layouts: " << print_layouts(syms) << endl;
+      }
+    }
     return 2;
   }
 }
