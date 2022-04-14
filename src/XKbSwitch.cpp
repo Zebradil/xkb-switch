@@ -64,7 +64,7 @@ string print_layouts(const string_vector& sv)
   return oss.str();
 }
 
-void i3_watch(XKeyboard& xkb, const string_vector& syms) {
+void i3_watch(XKeyboard& xkb, string_vector& syms) {
   map<int, int> window_group_map;
   int previous_container_id = 0;
   int default_group = xkb.get_group();
@@ -101,6 +101,7 @@ void i3_watch(XKeyboard& xkb, const string_vector& syms) {
         xkb.set_group(new_group);
         previous_container_id = ev.container->id;
 
+        xkb.build_layout(syms);
         std::cout << "\tWindow layout: " << syms.at(new_group) << std::endl;
       }
     }
