@@ -1,5 +1,4 @@
-Xkb-switch-i3
-=============
+# Xkb-switch-i3
 
 This i3-flavored version of [xkb-switch](https://github.com/ierton/xkb-switch)
 is capable of switching layout groups automatically in
@@ -8,8 +7,7 @@ focused, switches to the last active layout for the window.
 
 NOTE: Starting from version `1.6.1` xkb-switch-i3 has it's own versioning.
 
-Installation
-------------
+## Installation
 
 For Arch Linux
 [xkb-switch-i3](https://aur.archlinux.org/packages/xkb-switch-i3/) and
@@ -38,9 +36,7 @@ make
 make install
 ```
 
-
-Usage
------
+## Usage
 
 Run it in terminal and try changing windows and layouts to see how it works.
 
@@ -54,27 +50,37 @@ To have it started with i3, add the following to the configuration:
 exec_always --no-startup-id xkb-switch --i3
 ```
 
-Original README
-===============
+# Original README
 
-by J. Bromley, S. Mironov, Alexei Rad'kov
+by Jay Bromley, Sergei Mironov, Alexei Rad'kov
 
 xkb-switch is a C++ program that allows to query and change the XKB layout state.
-Originally ruby-based code written by J.Broomley.
+Originally ruby-based code written by Jay Bromley.
 
-* XKeyboard.cpp  Implementation for XKB query/set class
-* XKbSwitch.cpp  Main program
-* XKbSwitchApi.cpp The Vim API bindings
+- XKeyboard.cpp Implementation for XKB query/set class
+- XKbSwitch.cpp Main program
+- XKbSwitchApi.cpp The Vim API bindings
 
 The C++ class has no special dependencies on anything outside of
 X-related libraries, so it can be easily used with other software.
 
-Xkb-switch is licensed under the GNU GPLv3, see COPYING for details.
+Older versions of Xkb-switch were licensed under the GNU GPLv3, the current
+version is licensed under the MIT license. See COPYING for details.
 
-Installing
-----------
+<!-- vim-markdown-toc GFM -->
 
-Package *libxkbfile-dev* (or *libxkbfile-devel* for Fedora) needs to be
+- [Installing](#installing)
+- [Usage](#usage)
+- [VIM integration](#vim-integration)
+- [Layout groups](#layout-groups)
+- [Bugs or Problems](#bugs-or-problems)
+- [Licensing notice](#licensing-notice)
+
+<!-- vim-markdown-toc -->
+
+## Installing
+
+Package _libxkbfile-dev_ (or _libxkbfile-devel_ for Fedora) needs to be
 installed to build the program.
 
 To build the program manually, unpack the tarball and cd to source directory.
@@ -112,8 +118,7 @@ first time you're installing this program
 $ sudo ldconfig
 ```
 
-Usage
------
+## Usage
 
 ```
 $ xkb-switch --help
@@ -128,12 +133,11 @@ Usage: xkb-switch -s ARG            Sets current layout group to ARG
        xkb-switch [-p]              Displays current layout group
 ```
 
-*A note on `xkb-switch -x`*
+_A note on `xkb-switch -x`_
 Command line option `xkb-switch -x` has been removed recently. Please, use `setxkbmap
 -query` or `setxkbmap -print` to obtain debug information.
 
-VIM integration
----------------
+## VIM integration
 
 Xkb-switch goes with a library libxkbswitch.so which can be called from
 within Vim scripts like this:
@@ -147,8 +151,7 @@ call libcall(g:XkbSwitchLib, 'Xkb_Switch_setXkbLayout', 'us')
 See also [article in Russian](http://lin-techdet.blogspot.ru/2012/12/vim-xkb-switch-libcall.html)
 describing complex solution.
 
-Layout groups
--------------
+## Layout groups
 
 xkb-group.sh can help you to manage layout groups. Just run it and send some
 input at it's stdin every time you want to trigger layouts from primary to
@@ -167,21 +170,28 @@ switch # switch from de to us
 switch # switch from us to de
 ```
 
-Bugs or Problems
-----------------
+## Bugs or Problems
 
 Admittedly, I only tested with a few different layouts that I used. If you find
 any bugs let me know by submitting an issue or via grrwlf@gmail.com.
 
 References:
 
-* <https://www.x.org/releases/X11R7.5/doc/input/XKB-Config.html>
+- <https://www.x.org/releases/X11R7.5/doc/input/XKB-Config.html>
   - XKB configuration
-* <https://www.x.org/releases/current/doc/xorg-docs/input/XKB-Enhancing.html>
+- <https://www.x.org/releases/current/doc/xorg-docs/input/XKB-Enhancing.html>
   - How to further enhance XKB configuration
-* <https://0x64616c.livejournal.com/914.html>
+- <https://0x64616c.livejournal.com/914.html>
   - Old LJ post by Mitya describing minimalistic X11 kb test application
 
-Regards,
-Sergey.
+## Licensing notice
 
+In response to the [request](https://github.com/grwlf/xkb-switch/issues/69) I
+decided to re-license the project under the more permissive MIT license. Older
+versions of the software remain under the GPL license we used previously. This
+[StackExchange
+question](https://softwareengineering.stackexchange.com/questions/105912/can-you-change-code-distributed-under-the-mit-license-and-re-distribute-it-unde)
+includes some information regarding this kind of situations.
+I included the top-3 contributors into the MIT license text. Please contact me
+either directly or via the mentioned Github issue if you have any questions or
+suggestions regarding this decision.
